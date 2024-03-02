@@ -51,7 +51,7 @@ def handle_callback_query(call):
             bot.send_video(ADMIN_CHAT_ID, message.video_file_id, caption=message.caption)
         else:
             bot.send_message(ADMIN_CHAT_ID, "Error: Message object is missing.")
-
+        bot.edit_message_reply_markup(ADMIN_CHAT_ID, call.message.id, reply_markup=None)
         bot.send_message(author_chat_id, "Your message has been approved and sent to the channel.")
 
     elif action == "decline":
@@ -61,6 +61,8 @@ def handle_callback_query(call):
             bot.send_message(author_chat_id, "Your message has been declined.")
         else:
             bot.send_message(ADMIN_CHAT_ID, "Error: Message object is missing.")
+
+        bot.edit_message_reply_markup(ADMIN_CHAT_ID, call.message.id, reply_markup=None)
 
 # Enable bot to receive callback queries
 bot.enable_save_next_step_handlers(delay=2)
