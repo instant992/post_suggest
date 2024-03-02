@@ -16,7 +16,7 @@ def handle_message(message):
     # Copy message content and send to admin with inline keyboard
     markup = types.InlineKeyboardMarkup()
     approve_button = types.InlineKeyboardButton("Approve", callback_data=f"approve:{message.message_id}:{message.chat.id}")
-    decline_button = types.InlineKeyboardButton("Decline", callback_data=f"approve:{message.message_id}:{message.chat.id}")
+    decline_button = types.InlineKeyboardButton("Decline", callback_data=f"decline:{message.message_id}:{message.chat.id}")
     markup.add(approve_button, decline_button)
 
     if message.text:
@@ -51,7 +51,9 @@ def handle_callback_query(call):
             bot.send_video(ADMIN_CHAT_ID, message.video_file_id, caption=message.caption)
         else:
             bot.send_message(ADMIN_CHAT_ID, "Error: Message object is missing.")
+
         bot.send_message(author_chat_id, "Your message has been approved and sent to the channel.")
+
     elif action == "decline":
         # Check if the message object exists
         if message:
