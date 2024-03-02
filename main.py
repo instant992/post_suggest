@@ -20,7 +20,7 @@ def handle_message(message):
     markup.add(approve_button, decline_button)
 
     if message.text:
-        text = f"{message.text}\n\n" + post_template.substitute(post_author = message.from_user.username, bot_username = BOT_USERNAME)
+        text = f"{message.text}\n\n" + post_template.substitute(post_author=message.from_user.username, bot_username = BOT_USERNAME)
         bot.send_message(ADMIN_CHAT_ID, text, reply_markup=markup)
         bot.send_message(message.chat.id, "Ваш пост успешно отправлен на рассмотрение!")
     elif message.photo:
@@ -42,13 +42,16 @@ def handle_callback_query(call):
 
     if action == "approve":
         # Check if the message object exists
-        if message:
+        if message.text:
             # Send approved message to channel
             bot.send_message(TARGET_CHANNEL_ID, message.text)
-            # Notify user
-            bot.send_message(author_chat_id, "Your message has been approved and sent to the channel.")
+        elif message.photo:
+            bot.send_photo(TARGET_CHANNEL_ID, message.photo[-1].file_id, caption=message.caption)
+        elif message.video:
+            bot.send_video(ADMIN_CHAT_ID, message.video_file_id, caption=message.caption)
         else:
             bot.send_message(ADMIN_CHAT_ID, "Error: Message object is missing.")
+        bot.send_message(author_chat_id, "Your message has been approved and sent to the channel.")
     elif action == "decline":
         # Check if the message object exists
         if message:
