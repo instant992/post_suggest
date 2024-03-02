@@ -5,6 +5,8 @@ from config import BOT_TOKEN, ADMIN_CHAT_ID, POST_SAMPLE, BOT_USERNAME, TARGET_C
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
+post_template = Template(POST_SAMPLE)
+
 @bot.message_handler(commands=['start'])
 def start(message):
     bot.send_message(message.chat.id, "Welcome to bot! Send message!")
@@ -18,11 +20,12 @@ def handle_message(message):
     markup.add(approve_button, decline_button)
 
     if message.text:
-        bot.send_message(ADMIN_CHAT_ID, message.text, reply_markup=markup)
+        text = f"{message.text}\n\n" + post_template.substitute(post_author = message.from_user.username, bot_username = BOT_USERNAME)
+        bot.send_message(ADMIN_CHAT_ID, text, reply_markup=markup)
     elif message.photo:
-        # Handle photo message
         photo_file_id = message.photo[-1].file_id
-        bot.send_photo(ADMIN_CHAT_ID, photo_file_id, reply_markup=markup)
+        caption = f"{message.caption}\n\n" + post_template.substitute(post_author = message.from_user.username, bot_username = BOT_USERNAME)
+        bot.send_photo(ADMIN_CHAT_ID, photo_file_id, caption=caption, reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: True)
 def handle_callback_query(call):
