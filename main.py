@@ -37,8 +37,6 @@ def handle_message(message):
 @bot.callback_query_handler(func=lambda call: True)
 def handle_callback_query(call):
     # Extract message ID and action from callback data
-    print(call)
-    print(call.data)
     action, message_id, author_chat_id = call.data.split(":")
     message = call.message  # Extract the message object
 
