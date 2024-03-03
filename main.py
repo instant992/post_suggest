@@ -46,8 +46,10 @@ def handle_callback_query(call):
             # Send approved message to channel
             bot.send_message(TARGET_CHANNEL_ID, message.text)
         elif message.photo:
+            message.caption = message.caption if message.caption else ''
             bot.send_photo(TARGET_CHANNEL_ID, message.photo[-1].file_id, caption=message.caption)
         elif message.video:
+            message.caption = message.caption if message.caption else ''
             bot.send_video(ADMIN_CHAT_ID, message.video_file_id, caption=message.caption)
         else:
             bot.send_message(ADMIN_CHAT_ID, "Error: Message object is missing.")
