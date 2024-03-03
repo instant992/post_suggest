@@ -9,30 +9,32 @@ post_template = Template(POST_SAMPLE)
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    bot.send_message(message.chat.id, "Welcome to bot! Send message!")
+    bot.send_message(message.chat.id, "Приветствую! Пришлите фото или видео с сообщением или без.")
 
 @bot.message_handler(content_types=["photo", "text", "video"])
 def handle_message(message):
     # Copy message content and send to admin with inline keyboard
     markup = types.InlineKeyboardMarkup()
-    approve_button = types.InlineKeyboardButton("Approve", callback_data=f"approve:{message.message_id}:{message.chat.id}")
-    decline_button = types.InlineKeyboardButton("Decline", callback_data=f"decline:{message.message_id}:{message.chat.id}")
+    approve_button = types.InlineKeyboardButton("✅Запостить", callback_data=f"approve:{message.message_id}:{message.chat.id}")
+    decline_button = types.InlineKeyboardButton("❌Отклонить", callback_data=f"decline:{message.message_id}:{message.chat.id}")
     markup.add(approve_button, decline_button)
 
     if message.text:
         text = f"{message.text}\n\n" + post_template.substitute(post_author=message.from_user.username, bot_username = BOT_USERNAME)
         bot.send_message(ADMIN_CHAT_ID, text, reply_markup=markup)
-        bot.send_message(message.chat.id, "Ваш пост успешно отправлен на рассмотрение!")
+        bot.send_message(message.chat.id, "Ваш пост успешно отправлен на рассмотрение!👍")
     elif message.photo:
         photo_file_id = message.photo[-1].file_id
+        message.caption = message.caption if message.caption else ''
         caption = f"{message.caption}\n\n" + post_template.substitute(post_author = message.from_user.username, bot_username = BOT_USERNAME)
         bot.send_photo(ADMIN_CHAT_ID, photo_file_id, caption=caption, reply_markup=markup)
-        bot.send_message(message.chat.id, "Ваш пост успешно отправлен на рассмотрение!")
+        bot.send_message(message.chat.id, "Ваш пост успешно отправлен на рассмотрение!👍")
     elif message.video:
         video_file_id = message.video.file_id
+        message.caption = message.caption if message.caption else ''
         caption = f"{message.caption}\n\n" + post_template.substitute(post_author=message.from_user.username, bot_username=BOT_USERNAME)
         bot.send_video(ADMIN_CHAT_ID, video_file_id, caption=caption, reply_markup=markup)
-        bot.send_message(message.chat.id, "Ваш пост успешно отправлен на рассмотрение!")
+        bot.send_message(message.chat.id, "Ваш пост успешно отправлен на рассмотрение!👍")
 
 @bot.callback_query_handler(func=lambda call: True)
 def handle_callback_query(call):
@@ -46,21 +48,19 @@ def handle_callback_query(call):
             # Send approved message to channel
             bot.send_message(TARGET_CHANNEL_ID, message.text)
         elif message.photo:
-            message.caption = message.caption if message.caption else ''
             bot.send_photo(TARGET_CHANNEL_ID, message.photo[-1].file_id, caption=message.caption)
         elif message.video:
-            message.caption = message.caption if message.caption else ''
             bot.send_video(ADMIN_CHAT_ID, message.video_file_id, caption=message.caption)
         else:
             bot.send_message(ADMIN_CHAT_ID, "Error: Message object is missing.")
         bot.edit_message_reply_markup(ADMIN_CHAT_ID, call.message.id, reply_markup=None)
-        bot.send_message(author_chat_id, "Your message has been approved and sent to the channel.")
+        bot.send_message(author_chat_id, "🔥🔥Ваш пост был одобрен и отправлен в канал! ", reply_to_message_id=message_id)
 
     elif action == "decline":
         # Check if the message object exists
         if message:
             # Notify user
-            bot.send_message(author_chat_id, "Your message has been declined.")
+            bot.send_message(author_chat_id, "❌Ваш пост был отклонён.", reply_to_message_id=message_id)
         else:
             bot.send_message(ADMIN_CHAT_ID, "Error: Message object is missing.")
 
