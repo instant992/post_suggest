@@ -6,22 +6,22 @@ from config import POST_SAMPLE
 post_template = Template(POST_SAMPLE)
 
 def send_approved_message(bot, message, author_chat_id, message_id_in_author_chat):
+    print(f"DEBUG: {message}")
     if message.text:
         bot.send_message(TARGET_CHANNEL_ID, message.text)
     elif message.photo:
         bot.send_photo(TARGET_CHANNEL_ID, message.photo[-1].file_id, caption=message.caption)
     elif message.video:
         bot.send_video(TARGET_CHANNEL_ID, message.video.file_id, caption=message.caption)
-    else:
-        bot.send_message(ADMIN_CHAT_ID, "Error: Message object is missing.")
 
     bot.send_message(author_chat_id, "🔥🔥Ваш пост был одобрен и отправлен в канал! ", reply_to_message_id= message_id_in_author_chat)
+    bot.send_message(message.chat.id, "Отправлено в канал", reply_to_message_id= message.id)
 
 def send_declined_message(bot, message, author_chat_id, message_id_in_author_chat):
     if message:
         bot.send_message(author_chat_id, "❌Ваш пост был отклонён.", reply_to_message_id=message_id_in_author_chat)
-    else:
-        bot.send_message(ADMIN_CHAT_ID, "Error: Message object is missing.")
+
+    bot.send_message(message.chat.id, "Отклонено", reply_to_message_id= message.id)
 
 def approved_from_user_message(bot, message, message_id_in_author_chat):
     confirmation_markup = types.InlineKeyboardMarkup()
