@@ -11,7 +11,7 @@ def send_approved_message(bot, message, author_chat_id, message_id_in_author_cha
     elif message.photo:
         bot.send_photo(TARGET_CHANNEL_ID, message.photo[-1].file_id, caption=message.caption)
     elif message.video:
-        bot.send_video(TARGET_CHANNEL_ID, message.video_file_id, caption=message.caption)
+        bot.send_video(TARGET_CHANNEL_ID, message.video.file_id, caption=message.caption)
     else:
         bot.send_message(ADMIN_CHAT_ID, "Error: Message object is missing.")
 
