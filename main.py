@@ -7,6 +7,11 @@ from actions.actions import send_approved_message,send_declined_message, approve
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
+#TODO: Fix DRY
+#   add scheduled messages
+#   add logs
+#   add statistics???
+
 @bot.message_handler(commands=['start'])
 def start(message):
     bot.send_message(message.chat.id, "Приветствую! Пришлите фото или видео с сообщением или без.")
@@ -27,11 +32,11 @@ def handle_message(message):
     elif message.photo:
         photo_file_id = message.photo[-1].file_id
         message.caption = message.caption if message.caption else ''
-        bot.send_photo(message.chat.id, photo_file_id, caption=message.caption, reply_markup=confirmation_markup)
+        bot.send_photo(message.chat.id, message.photo_file_id, caption=message.caption, reply_markup=confirmation_markup)
     elif message.video:
         video_file_id = message.video.file_id
         message.caption = message.caption if message.caption else ''
-        bot.send_video(message.chat.id, video_file_id, caption=message.caption, reply_markup=confirmation_markup)
+        bot.send_video(message.chat.id, message.video_file_id, caption=message.caption, reply_markup=confirmation_markup)
 
 #For admin approvement
 @bot.callback_query_handler(func=lambda call: True)
