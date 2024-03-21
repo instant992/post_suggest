@@ -1,16 +1,16 @@
+import time
+import schedule
 import telebot
+
+from schedule import every, repeat
+from threading import Thread
 from telebot import types
 
 from config import BOT_TOKEN, ADMIN_CHAT_ID
 
-from actions.actions import send_approved_message,send_declined_message, approved_from_user_message, declined_from_user_message, anonymous_from_user_message
+from actions.actions import poll_delayed_messages, send_approved_message, send_declined_message, send_delayed_message, approved_from_user_message, declined_from_user_message, anonymous_from_user_message
 
 bot = telebot.TeleBot(BOT_TOKEN)
-
-#TODO: Fix DRY
-#   add scheduled messages
-#   add logs
-#   add statistics???
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -44,27 +44,34 @@ def handle_callback_query(call):
     # Extract message ID and action from callback data
     action, author_chat_id, message_id_in_author_chat = call.data.split(":")
     message = call.message  # Extract the message object
-
-    match action:
-        case "user_post_approve":
-            approved_from_user_message(bot, message, message_id_in_author_chat)
-            bot.edit_message_reply_markup(author_chat_id, call.message.id, reply_markup=None)
-        case "user_post_decline":
-            declined_from_user_message(bot, author_chat_id)
-            bot.edit_message_reply_markup(author_chat_id, call.message.id, reply_markup=None)
-        case "user_post_anonymous":
-            anonymous_from_user_message(bot, message, message_id_in_author_chat)
-            bot.edit_message_reply_markup(author_chat_id, call.message.id, reply_markup=None)
-        case "admin_post_approve":
-            send_approved_message(bot, message, author_chat_id, message_id_in_author_chat)
-            bot.edit_message_reply_markup(ADMIN_CHAT_ID, call.message.id, reply_markup=None)
-        case "admin_post_decline":
-            send_declined_message(bot, message, author_chat_id, message_id_in_author_chat)
-            bot.edit_message_reply_markup(ADMIN_CHAT_ID, call.message.id, reply_markup=None)
-
+    if message:
+        match action:
+            case "user_post_approve":
+                approved_from_user_message(bot, message, message_id_in_author_chat)
+            case "user_post_decline":
+                declined_from_user_message(bot, author_chat_id)
+            case "user_post_anonymous":
+                anonymous_from_user_message(bot, message, message_id_in_author_chat)
+            case "admin_post_approve":
+                send_approved_message(bot, message, author_chat_id, message_id_in_author_chat)
+            case "admin_post_decline":
+                send_declined_message(bot, message, author_chat_id, message_id_in_author_chat)
+            case "admin_post_delay":
+                send_delayed_message(bot, message, author_chat_id, message_id_in_author_chat)
+        bot.edit_message_reply_markup(ADMIN_CHAT_ID, call.message.id, reply_markup=None)
 
 # Enable bot to receive callback queries
 bot.enable_save_next_step_handlers(delay=2)
 bot.load_next_step_handlers()
+
+def delay_start():
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+@repeat(every(5).minutes)
+def delay():
+    poll_delayed_messages(bot)
+
+Thread(target=delay_start).start()
 
 bot.infinity_polling(timeout=10, long_polling_timeout = 5)
