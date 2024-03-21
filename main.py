@@ -12,10 +12,6 @@ from actions.actions import poll_delayed_messages, send_approved_message, send_d
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
-#TODO: Fix DRY
-#   add logs
-#   add statistics???
-
 @bot.message_handler(commands=['start'])
 def start(message):
     bot.send_message(message.chat.id, "Приветствую! Пришлите фото или видео с сообщением или без.")
@@ -72,7 +68,7 @@ def delay_start():
     while True:
         schedule.run_pending()
         time.sleep(1)
-@repeat(every().minute)
+@repeat(every(5).minutes)
 def delay():
     poll_delayed_messages(bot)
 
