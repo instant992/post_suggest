@@ -82,7 +82,9 @@ def anonymous_from_user_message(bot, message, message_id_in_author_chat):
     confirmation_markup = types.InlineKeyboardMarkup()
     approve_button = types.InlineKeyboardButton("✅Подтвердить", callback_data=f"admin_post_approve:{message.chat.id}:{message_id_in_author_chat}")
     decline_button = types.InlineKeyboardButton("❌Отклонить", callback_data=f"admin_post_decline:{message.chat.id}:{message_id_in_author_chat}")
+    delay_button = types.InlineKeyboardButton("⏰Отложить", callback_data=f"admin_post_delay:{message.chat.id}:{message_id_in_author_chat}")
     confirmation_markup.add(approve_button, decline_button)
+    confirmation_markup.add(delay_button)
 
     if message.text:
         text = f"{message.text}\n\n" + post_template.substitute(post_author="Аноним",
