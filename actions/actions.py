@@ -30,7 +30,7 @@ def send_declined_message(bot, message, author_chat_id, message_id_in_author_cha
     bot.send_message(message.chat.id, "Отклонено", reply_to_message_id= message.id)
     print(f'Message with id {message.id} has been declined by admin.')
 
-def send_delayed_message(bot, message, author_chat_id, message_id_in_author_chat):
+def send_delayed_message(bot, message, author_chat_id):
     bot.send_message(ADMIN_CHAT_ID, "Введите время отправки в формате дд.мм.гггг чч:мм:")
     bot.send_message(author_chat_id, "🔥🔥Ваш пост был одобрен. Скоро он будет опубликован!")
     target_message = message
@@ -129,6 +129,6 @@ def poll_delayed_messages(bot):
                     bot.send_video(TARGET_CHANNEL_ID, data['message'].video.file_id, caption=data['message'].caption)
             print(f'Message with id {item_id} has sent to channel.')
             messages.pop(item_id)
-            print(f'Message with id {message.id} deleted from the delay queue.')
+            print(f'Message with id {item_id} deleted from the delay queue.')
             break
-    print("Ended polling messages")
+    print(f"Ended polling messages. {len(messages)} are in the queue now.")

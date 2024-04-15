@@ -57,7 +57,7 @@ def handle_callback_query(call):
             case "admin_post_decline":
                 send_declined_message(bot, message, author_chat_id, message_id_in_author_chat)
             case "admin_post_delay":
-                send_delayed_message(bot, message, author_chat_id, message_id_in_author_chat)
+                send_delayed_message(bot, message, author_chat_id)
         bot.edit_message_reply_markup(ADMIN_CHAT_ID, call.message.id, reply_markup=None)
 
 # Enable bot to receive callback queries
@@ -67,10 +67,8 @@ bot.load_next_step_handlers()
 def delay_start():
     while True:
         schedule.run_pending()
-        time.sleep(1)
-@repeat(every(5).minutes)
-def delay():
-    poll_delayed_messages(bot)
+        time.sleep(10)
+        poll_delayed_messages(bot)
 
 Thread(target=delay_start).start()
 
