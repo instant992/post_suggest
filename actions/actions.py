@@ -1,5 +1,6 @@
 import time
 
+import pytz
 from telebot import types
 from config import TARGET_CHANNEL_ID, ADMIN_CHAT_ID, BOT_USERNAME
 from string import Template
@@ -116,7 +117,7 @@ def declined_from_user_message(bot, author_chat_id):
 
 def poll_delayed_messages(bot):
     print("Started polling delayed messages at ", time.strftime("%a, %d %b %Y %H:%M:%S", time.gmtime()))
-    current_time = datetime.now()
+    current_time = datetime.strptime(str(datetime.now(pytz.timezone('Europe/Saratov'))).split('.')[0], "%Y-%m-%d %H:%M:%S")
     for item_id, data in messages.items():
         if data['time'] is not None and data['time'] <= current_time:
             print(f"Detected a message with id {item_id} that should be posted at {data['time']}")
